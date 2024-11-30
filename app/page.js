@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import PDFUploader from './components/pdf/PDFUploader';
 import PDFViewer from './components/pdf/PDFViewer';
 import Navbar from './components/Navbar';
+import AIAnalysis from './components/AIAnalysis';
 
 const STORAGE_KEY = 'legal_lens_current_doc';
 
@@ -63,6 +64,9 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
+              </div>
+              <div className="lg:w-[400px] fade-in">
+                <AIAnalysis />
               </div>
             </>
           )}
