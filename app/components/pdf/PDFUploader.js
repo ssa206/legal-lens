@@ -16,39 +16,44 @@ import { useDropzone } from 'react-dropzone';
 const PDFUploader = ({ onPDFUpload, onTextExtracted }) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const extractText = async (arrayBuffer) => {
+    const pdfjsLib = await import('pdfjs-dist');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+    
+    try {
+      const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+      let text = '';
+      
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => item.str).join(' ') + '\n';
+      }
+      
+      return text.trim();
+    } catch (error) {
+      console.error('Error extracting text:', error);
+      throw error;
+    }
+  };
+
   const onDrop = useCallback(async (acceptedFiles) => {
     if (acceptedFiles.length > 0) {
       const file = acceptedFiles[0];
       setIsProcessing(true);
       
       try {
-        // Create a URL for the PDF file
+        // Create URL for PDF viewer
         const fileUrl = URL.createObjectURL(file);
         onPDFUpload(fileUrl);
-        
-        // Load the PDF.js library dynamically
-        const pdfjsLib = await import('pdfjs-dist/build/pdf');
-        const pdfjsWorker = await import('pdfjs-dist/build/pdf.worker.entry');
-        
-        pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
-        // Load the PDF document
-        const loadingTask = pdfjsLib.getDocument(fileUrl);
-        const pdf = await loadingTask.promise;
-        
-        let fullText = '';
-        
-        // Extract text from each page
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const textContent = await page.getTextContent();
-          const pageText = textContent.items.map(item => item.str).join(' ');
-          fullText += pageText + '\n';
-        }
-
-        onTextExtracted(fullText);
+        // Extract text
+        const buffer = await file.arrayBuffer();
+        const text = await extractText(buffer);
+        onTextExtracted(text);
       } catch (error) {
         console.error('Error processing PDF:', error);
+        onTextExtracted('Error extracting text from PDF');
       } finally {
         setIsProcessing(false);
       }

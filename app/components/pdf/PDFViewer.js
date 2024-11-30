@@ -1,53 +1,26 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import { useState } from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 
-// Dynamically import react-pdf components
-const PDFDocument = dynamic(() => import('react-pdf').then(mod => mod.Document), {
-  ssr: false,
-  loading: () => <p>Loading PDF viewer...</p>
-});
-
-const PDFPage = dynamic(() => import('react-pdf').then(mod => mod.Page), {
-  ssr: false
-});
+// Initialize PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 /**
- * PDFViewer Component
+ * PDFViewer Component - Displays a PDF document
  * 
  * @component
  * @param {Object} props
  * @param {string} props.file - PDF file URL to display
- * 
- * @returns {JSX.Element} Rendered PDF viewer component
  */
 const PDFViewer = ({ file }) => {
   const [numPages, setNumPages] = useState(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const containerRef = useRef(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Load the PDF.js worker
-    const loadWorker = async () => {
-      const { pdfjs } = await import('react-pdf');
-      pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-        'pdfjs-dist/build/pdf.worker.min.js',
-        import.meta.url,
-      ).toString();
-    };
-    
-    loadWorker();
-  }, []);
 
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
-    setLoading(false);
-  }
-
-  function onDocumentLoadError(error) {
-    console.error('Error loading PDF:', error);
     setLoading(false);
   }
 
@@ -56,23 +29,25 @@ const PDFViewer = ({ file }) => {
   }
 
   return (
-    <div className="w-full h-full overflow-auto" ref={containerRef}>
+    <div className="w-full h-full overflow-auto bg-white rounded-lg shadow p-4">
       {loading && <div className="text-center p-4">Loading PDF...</div>}
-      <PDFDocument
+      <Document
         file={file}
         onLoadSuccess={onDocumentLoadSuccess}
-        onLoadError={onDocumentLoadError}
         className="flex flex-col items-center"
+        renderTextLayer={false}
+        renderAnnotationLayer={false}
       >
-        {numPages && Array.from(new Array(numPages), (el, index) => (
-          <PDFPage
+        {Array.from(new Array(numPages), (el, index) => (
+          <Page
             key={`page_${index + 1}`}
             pageNumber={index + 1}
+            renderTextLayer={false}
+            renderAnnotationLayer={false}
             className="mb-4"
-            width={containerRef.current?.offsetWidth ? containerRef.current.offsetWidth - 50 : undefined}
           />
         ))}
-      </PDFDocument>
+      </Document>
     </div>
   );
 };
