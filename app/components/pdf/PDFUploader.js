@@ -94,71 +94,59 @@ const PDFUploader = ({ onFileChange }) => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      'application/pdf': ['.pdf']
-    },
-    maxFiles: 1
+    accept: { 'application/pdf': ['.pdf'] },
+    maxSize: MAX_FILE_SIZE,
+    multiple: false,
   });
 
   return (
-    <div className="w-full">
+    <div className="w-full fade-in">
       <div
         {...getRootProps()}
-        className={`
-          w-full p-8 border-2 border-dashed rounded-2xl
-          transition-colors duration-200 ease-in-out cursor-pointer
-          flex flex-col items-center justify-center text-center
-          ${isDragActive 
-            ? 'border-blue-500 bg-blue-50 bg-opacity-10' 
-            : 'border-[--gray-200] hover:border-blue-500 hover:bg-[--gray-50]'
-          }
-          ${isProcessing ? 'opacity-70 cursor-wait' : ''}
-        `}
+        className={`dropzone ${isDragActive ? 'active' : ''}`}
       >
         <input {...getInputProps()} />
         
-        <div className="mb-4">
-          <svg 
-            className={`w-12 h-12 ${isDragActive ? 'text-blue-500' : 'text-[--gray-300]'}`}
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={1.5} 
-              d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
-            />
-          </svg>
-        </div>
-        
-        <p className="text-lg font-medium mb-2">
-          {isProcessing 
-            ? 'Processing document...' 
-            : isDragActive 
-              ? 'Drop your PDF here' 
-              : 'Upload your legal document'
-          }
-        </p>
-        
-        <p className="text-sm text-[--gray-400] mb-2">
-          {isProcessing 
-            ? 'Extracting text from document...'
-            : 'Drag and drop your PDF file here, or click to select'
-          }
-        </p>
-        
-        <p className="text-xs text-[--gray-300]">
-          Maximum file size: 10MB
-        </p>
-
-        {error && (
-          <div className="mt-4 text-sm text-red-500">
-            {error}
+        {isProcessing ? (
+          <div className="space-y-3">
+            <div className="w-16 h-16 mx-auto">
+              <svg className="animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-lg font-medium">Processing document<span className="loading-dots"></span></p>
+              <p className="text-sm text-gray-500 mt-1">This may take a few moments</p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="w-16 h-16 mx-auto text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-lg font-medium">
+                {isDragActive ? 'Drop your PDF here' : 'Upload your legal document'}
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                Drag and drop your PDF file here, or click to browse
+              </p>
+              <p className="text-xs text-gray-400 mt-2">
+                Maximum file size: 10MB
+              </p>
+            </div>
           </div>
         )}
       </div>
+
+      {error && (
+        <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
+          {error}
+        </div>
+      )}
     </div>
   );
 };
