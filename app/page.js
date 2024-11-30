@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import PDFUploader from './components/pdf/PDFUploader';
 import PDFViewer from './components/pdf/PDFViewer';
+import Navbar from './components/Navbar';
 
 const STORAGE_KEY = 'legal_lens_current_doc';
 
@@ -32,29 +33,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen p-4 md:p-8">
-      {/* Navbar */}
-      <nav className="glass-panel rounded-2xl p-4 mb-6 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-            Legal Lens
-          </div>
-          <div className="hidden md:block text-sm text-[--gray-400]">
-            AI-Powered Legal Document Analysis
-          </div>
-        </div>
-        {currentPDF && (
-          <button
-            onClick={handleNewUpload}
-            className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:opacity-90 transition-opacity"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Upload New</span>
-          </button>
-        )}
-      </nav>
-
+      <Navbar onNewUpload={handleNewUpload} showNewUploadButton={!!currentPDF} />
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-12rem)]">
         {!currentPDF ? (
