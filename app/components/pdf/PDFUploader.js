@@ -153,21 +153,76 @@ const PDFUploader = ({ onPDFUpload, onTextExtracted }) => {
     <div className="space-y-4">
       <div
         {...getRootProps()}
-        className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer
-          ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
+        className={`glass-panel rounded-2xl p-8 text-center cursor-pointer
+          transition-all duration-200 ease-out
+          ${isDragActive ? 'ring-2 ring-[--primary] scale-[1.01]' : 'hover:scale-[1.01]'}
+          ${isProcessing ? 'opacity-70 cursor-wait' : ''}`}
       >
         <input {...getInputProps()} />
-        {isProcessing ? (
-          <p>Processing PDF...</p>
-        ) : isDragActive ? (
-          <p>Drop the PDF here...</p>
-        ) : (
-          <p>Drag and drop a PDF here, or click to select one (max {MAX_PDF_SIZE_MB}MB)</p>
-        )}
+        <div className="space-y-4">
+          <div className="w-16 h-16 mx-auto rounded-full bg-[--primary] bg-opacity-10 flex items-center justify-center">
+            <svg
+              className="w-8 h-8 text-[--primary]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+              />
+            </svg>
+          </div>
+          
+          {isProcessing ? (
+            <div className="animate-pulse">
+              <p className="text-lg font-medium text-[--gray-300]">Processing document...</p>
+              <p className="text-sm text-[--gray-300] mt-2">This may take a moment</p>
+            </div>
+          ) : isDragActive ? (
+            <div className="animate-fade-in">
+              <p className="text-lg font-medium text-[--primary]">Drop your document here</p>
+              <p className="text-sm text-[--gray-300] mt-2">Release to upload</p>
+            </div>
+          ) : (
+            <>
+              <div>
+                <p className="text-lg font-medium">Upload your document</p>
+                <p className="text-sm text-[--gray-300] mt-2">
+                  Drag and drop your PDF here, or click to browse
+                </p>
+              </div>
+              <div className="text-xs text-[--gray-300] mt-4">
+                Maximum file size: {MAX_PDF_SIZE_MB}MB
+              </div>
+            </>
+          )}
+        </div>
       </div>
+      
       {error && (
-        <div className="text-red-500 text-sm">
-          {error}
+        <div className="glass-panel rounded-xl p-4 border-l-4 border-l-[--error] animate-fade-in">
+          <div className="flex items-start space-x-3">
+            <svg
+              className="w-5 h-5 text-[--error] mt-0.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <div>
+              <h3 className="text-sm font-medium">Upload Failed</h3>
+              <p className="text-xs text-[--gray-300] mt-1">{error}</p>
+            </div>
+          </div>
         </div>
       )}
     </div>
