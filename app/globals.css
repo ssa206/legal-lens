@@ -7,8 +7,9 @@
 :root {
   --background: #ffffff;
   --foreground: #1d1d1f;
-  --primary: #2563eb;
-  --primary-dark: #1d4ed8;
+  --primary: #4f46e5;
+  --primary-dark: #4338ca;
+  --primary-light: #c7d2fe;
   --gray-50: #f8fafc;
   --gray-100: #f1f5f9;
   --gray-200: #e2e8f0;
@@ -23,6 +24,10 @@
     background: var(--background);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
+    background-image: 
+      radial-gradient(circle at 100% 100%, var(--primary-light) 0%, transparent 20%),
+      radial-gradient(circle at 0% 0%, var(--primary-light) 0%, transparent 20%);
+    background-attachment: fixed;
   }
 
   ::selection {
@@ -33,25 +38,70 @@
 
 @layer components {
   .glass-panel {
-    @apply backdrop-blur-xl bg-opacity-50 shadow-lg;
+    @apply backdrop-blur-xl bg-opacity-50 shadow-lg relative;
     background-color: var(--gray-50);
     border: 1px solid var(--gray-100);
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        120deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.3) 50%,
+        rgba(255,255,255,0) 100%
+      );
+      transform: translateX(-100%);
+      animation: shine 8s infinite;
+    }
+  }
+
+  @keyframes shine {
+    0% { transform: translateX(-100%); }
+    20%, 100% { transform: translateX(100%); }
   }
 
   .button-primary {
     @apply bg-[--primary] hover:bg-[--primary-dark] text-white font-medium px-6 py-2.5 rounded-xl
     transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] shadow-sm
-    hover:shadow-md hover:shadow-blue-200;
+    hover:shadow-md hover:shadow-indigo-200 relative overflow-hidden;
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: translateX(-100%);
+      animation: shimmer 3s infinite;
+    }
+  }
+
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
   }
 
   .dropzone {
-    @apply border-2 border-dashed rounded-2xl p-8 transition-all duration-200
-    bg-gray-50 hover:bg-gray-100 border-gray-200 hover:border-gray-300
-    cursor-pointer text-center;
+    @apply border-2 border-dashed rounded-2xl p-8 transition-all duration-300
+    bg-white hover:bg-indigo-50 border-gray-200 hover:border-indigo-300
+    cursor-pointer text-center relative overflow-hidden;
+    background-image: 
+      radial-gradient(circle at 0% 0%, var(--primary-light) 0%, transparent 25%),
+      radial-gradient(circle at 100% 100%, var(--primary-light) 0%, transparent 25%);
+    animation: pulse 3s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.005); }
   }
 
   .dropzone.active {
-    @apply border-[--primary] bg-blue-50;
+    @apply border-[--primary] bg-indigo-50;
+    animation: bounce 0.5s;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
   }
 
   .loading-dots:after {
@@ -73,5 +123,30 @@
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  .scale-in {
+    animation: scaleIn 0.3s ease-out;
+  }
+
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm 
+    flex items-center justify-center p-4 z-50;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .modal-content {
+    @apply w-full max-w-2xl bg-white rounded-2xl p-6 shadow-2xl;
+    animation: modalIn 0.3s ease-out;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
   }
 }

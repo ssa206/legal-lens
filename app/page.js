@@ -32,7 +32,7 @@ export default function Home() {
   }, [currentPDF]);
 
   return (
-    <main className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-gray-50 to-white">
+    <main className="min-h-screen p-4 md:p-8">
       <div className="max-w-[1920px] mx-auto">
         <Navbar onNewUpload={handleNewUpload} showNewUploadButton={!!currentPDF} />
         
@@ -52,9 +52,16 @@ export default function Home() {
 
               {/* Right Panel - AI Analysis */}
               <div className="lg:w-[400px] glass-panel rounded-2xl p-6 h-full overflow-y-auto fade-in">
-                <h2 className="text-xl font-semibold mb-4">Document Analysis</h2>
+                <h2 className="text-xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                  Document Analysis
+                </h2>
                 <div className="space-y-4">
                   {/* Analysis content */}
+                  <div className="p-4 rounded-xl bg-indigo-50 border border-indigo-100">
+                    <p className="text-sm text-indigo-600">
+                      AI analysis features coming soon...
+                    </p>
+                  </div>
                 </div>
               </div>
             </>
@@ -64,8 +71,25 @@ export default function Home() {
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 fade-in">
-          <div className="w-full max-w-2xl bg-white rounded-2xl p-6 shadow-xl">
+        <div className="modal-overlay">
+          <div className="modal-content relative">
+            <button
+              onClick={() => setShowUploadModal(false)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+              aria-label="Close modal"
+            >
+              <svg className="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                Upload Legal Document
+              </h2>
+              <p className="text-gray-500 mt-1">
+                Upload your document to get started with AI-powered analysis
+              </p>
+            </div>
             <PDFUploader onFileChange={handleFileChange} />
           </div>
         </div>
