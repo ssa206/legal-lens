@@ -17,17 +17,6 @@
   --error: #ff3b30;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #000000;
-    --foreground: #f5f5f7;
-    --gray-50: #1d1d1f;
-    --gray-100: #2d2d2f;
-    --gray-200: #3d3d3f;
-    --gray-300: #86868b;
-  }
-}
-
 @layer base {
   body {
     color: var(--foreground);
@@ -39,7 +28,7 @@
 
 @layer components {
   .glass-panel {
-    @apply backdrop-blur-xl bg-opacity-50 dark:bg-opacity-30;
+    @apply backdrop-blur-xl bg-opacity-50;
     background-color: var(--gray-50);
     border: 1px solid var(--gray-100);
   }
