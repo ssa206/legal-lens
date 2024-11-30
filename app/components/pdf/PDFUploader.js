@@ -3,88 +3,48 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 
-// Constants for size limits
-const MAX_PDF_SIZE_MB = 10;
-const MAX_STORAGE_SIZE_MB = 5; // Conservative estimate for localStorage limit
-const BYTES_PER_MB = 1024 * 1024;
-const STORAGE_KEY = 'legal_lens_current_doc';
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const STORAGE_KEY_PREFIX = 'legal_lens_';
 
-/**
- * Storage utility functions
- */
-const storageUtils = {
-  // Get size of all data in localStorage
-  getTotalStorageSize: () => {
-    let total = 0;
-    for (let key in localStorage) {
-      if (localStorage.hasOwnProperty(key)) {
-        total += localStorage[key].length * 2; // multiply by 2 for UTF-16 encoding
-      }
-    }
-    return total;
-  },
-
-  // Get available storage space in bytes
-  getAvailableSpace: () => {
-    const totalSize = storageUtils.getTotalStorageSize();
-    return (MAX_STORAGE_SIZE_MB * BYTES_PER_MB) - totalSize;
-  },
-
-  // Clear current document from storage
-  clearCurrentDocument: () => {
-    localStorage.removeItem(STORAGE_KEY);
-  },
-
-  // Store text for current document
-  storeText: (text) => {
-    try {
-      // Clear any existing document first
-      storageUtils.clearCurrentDocument();
-      
-      // Try to store the new text
-      localStorage.setItem(STORAGE_KEY, text);
-      return true;
-    } catch (e) {
-      console.error('Storage failed:', e);
-      return false;
-    }
-  },
-
-  // Get current document text
-  getCurrentText: () => {
-    return localStorage.getItem(STORAGE_KEY);
-  }
-};
-
-/**
- * PDFUploader Component
- * 
- * @component
- * @param {Object} props
- * @param {Function} props.onPDFUpload - Callback function called with uploaded PDF file
- * @param {Function} props.onTextExtracted - Callback function called with extracted text
- * 
- * @returns {JSX.Element} Rendered PDF uploader component
- */
-const PDFUploader = ({ onPDFUpload, onTextExtracted }) => {
-  const [isProcessing, setIsProcessing] = useState(false);
+const PDFUploader = ({ onFileChange }) => {
   const [error, setError] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const clearPreviousStorage = () => {
+    // Clear all previous document data
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith(STORAGE_KEY_PREFIX)) {
+        localStorage.removeItem(key);
+      }
+    });
+  };
 
   const extractText = async (arrayBuffer) => {
     const pdfjsLib = await import('pdfjs-dist');
-    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
     
     try {
       const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-      let text = '';
+      const totalPages = pdf.numPages;
       
-      for (let i = 1; i <= pdf.numPages; i++) {
+      // Store total pages
+      localStorage.setItem(`${STORAGE_KEY_PREFIX}total_pages`, totalPages.toString());
+      
+      // Extract text for each page
+      for (let i = 1; i <= totalPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
-        text += content.items.map(item => item.str).join(' ') + '\n';
+        const pageText = content.items.map(item => item.str).join(' ').trim();
+        
+        // Store each page's text separately
+        localStorage.setItem(`${STORAGE_KEY_PREFIX}page_${i}_text`, pageText);
+        
+        // Log progress
+        console.log(`Processed page ${i} of ${totalPages}`);
       }
       
-      return text.trim();
+      return totalPages;
     } catch (error) {
       console.error('Error extracting text:', error);
       throw error;
@@ -92,139 +52,113 @@ const PDFUploader = ({ onPDFUpload, onTextExtracted }) => {
   };
 
   const onDrop = useCallback(async (acceptedFiles) => {
-    if (acceptedFiles.length > 0) {
-      setError(null);
-      const file = acceptedFiles[0];
-      
-      // Check file size
-      if (file.size > MAX_PDF_SIZE_MB * BYTES_PER_MB) {
-        setError(`PDF file size must be less than ${MAX_PDF_SIZE_MB}MB`);
-        return;
-      }
+    setError(null);
+    const file = acceptedFiles[0];
 
-      setIsProcessing(true);
-      
-      try {
-        // Create URL for PDF viewer
-        const fileUrl = URL.createObjectURL(file);
-        onPDFUpload(fileUrl);
-
-        // Extract text
-        const buffer = await file.arrayBuffer();
-        const text = await extractText(buffer);
-        
-        // Calculate text size
-        const textSizeInBytes = new Blob([text]).size;
-        console.log(`Extracted text size: ${(textSizeInBytes / BYTES_PER_MB).toFixed(2)} MB`);
-
-        // Check if we have enough space after clearing current document
-        const availableSpace = storageUtils.getAvailableSpace() + 
-          (storageUtils.getCurrentText()?.length * 2 || 0); // Add space that will be freed
-        
-        if (textSizeInBytes > availableSpace) {
-          setError('Not enough storage space. The extracted text is too large.');
-          return;
-        }
-
-        // Store the text (this will automatically clear the previous document)
-        if (!storageUtils.storeText(text)) {
-          setError('Failed to store text. The file might be too large.');
-          return;
-        }
-
-        console.log('Successfully stored new document text');
-        onTextExtracted(text);
-      } catch (error) {
-        console.error('Error processing PDF:', error);
-        setError('Error processing PDF: ' + error.message);
-      } finally {
-        setIsProcessing(false);
-      }
+    if (!file) {
+      setError('Please select a PDF file.');
+      return;
     }
-  }, [onPDFUpload, onTextExtracted]);
+
+    if (file.size > MAX_FILE_SIZE) {
+      setError('File size must be less than 10MB.');
+      return;
+    }
+
+    if (file.type !== 'application/pdf') {
+      setError('Only PDF files are supported.');
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      // Create URL for PDF viewer
+      const fileUrl = URL.createObjectURL(file);
+
+      // Clear previous document data
+      clearPreviousStorage();
+
+      // Extract and store text
+      const buffer = await file.arrayBuffer();
+      const totalPages = await extractText(buffer);
+      
+      console.log(`Successfully processed all ${totalPages} pages`);
+      onFileChange(fileUrl);
+    } catch (error) {
+      console.error('Error processing PDF:', error);
+      setError('Error processing PDF: ' + error.message);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [onFileChange]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { 'application/pdf': ['.pdf'] },
-    multiple: false
+    accept: {
+      'application/pdf': ['.pdf']
+    },
+    maxFiles: 1
   });
 
   return (
-    <div className="space-y-4">
+    <div className="w-full">
       <div
         {...getRootProps()}
-        className={`glass-panel rounded-2xl p-8 text-center cursor-pointer
-          transition-all duration-200 ease-out
-          ${isDragActive ? 'ring-2 ring-[--primary] scale-[1.01]' : 'hover:scale-[1.01]'}
-          ${isProcessing ? 'opacity-70 cursor-wait' : ''}`}
+        className={`
+          w-full p-8 border-2 border-dashed rounded-2xl
+          transition-colors duration-200 ease-in-out cursor-pointer
+          flex flex-col items-center justify-center text-center
+          ${isDragActive 
+            ? 'border-blue-500 bg-blue-50 bg-opacity-10' 
+            : 'border-[--gray-200] hover:border-blue-500 hover:bg-[--gray-50]'
+          }
+          ${isProcessing ? 'opacity-70 cursor-wait' : ''}
+        `}
       >
         <input {...getInputProps()} />
-        <div className="space-y-4">
-          <div className="w-16 h-16 mx-auto rounded-full bg-[--primary] bg-opacity-10 flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-[--primary]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-              />
-            </svg>
-          </div>
-          
-          {isProcessing ? (
-            <div className="animate-pulse">
-              <p className="text-lg font-medium text-[--gray-300]">Processing document...</p>
-              <p className="text-sm text-[--gray-300] mt-2">This may take a moment</p>
-            </div>
-          ) : isDragActive ? (
-            <div className="animate-fade-in">
-              <p className="text-lg font-medium text-[--primary]">Drop your document here</p>
-              <p className="text-sm text-[--gray-300] mt-2">Release to upload</p>
-            </div>
-          ) : (
-            <>
-              <div>
-                <p className="text-lg font-medium">Upload your document</p>
-                <p className="text-sm text-[--gray-300] mt-2">
-                  Drag and drop your PDF here, or click to browse
-                </p>
-              </div>
-              <div className="text-xs text-[--gray-300] mt-4">
-                Maximum file size: {MAX_PDF_SIZE_MB}MB
-              </div>
-            </>
-          )}
+        
+        <div className="mb-4">
+          <svg 
+            className={`w-12 h-12 ${isDragActive ? 'text-blue-500' : 'text-[--gray-300]'}`}
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={1.5} 
+              d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
+            />
+          </svg>
         </div>
+        
+        <p className="text-lg font-medium mb-2">
+          {isProcessing 
+            ? 'Processing document...' 
+            : isDragActive 
+              ? 'Drop your PDF here' 
+              : 'Upload your legal document'
+          }
+        </p>
+        
+        <p className="text-sm text-[--gray-400] mb-2">
+          {isProcessing 
+            ? 'Extracting text from document...'
+            : 'Drag and drop your PDF file here, or click to select'
+          }
+        </p>
+        
+        <p className="text-xs text-[--gray-300]">
+          Maximum file size: 10MB
+        </p>
+
+        {error && (
+          <div className="mt-4 text-sm text-red-500">
+            {error}
+          </div>
+        )}
       </div>
-      
-      {error && (
-        <div className="glass-panel rounded-xl p-4 border-l-4 border-l-[--error] animate-fade-in">
-          <div className="flex items-start space-x-3">
-            <svg
-              className="w-5 h-5 text-[--error] mt-0.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <div>
-              <h3 className="text-sm font-medium">Upload Failed</h3>
-              <p className="text-xs text-[--gray-300] mt-1">{error}</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
