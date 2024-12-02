@@ -1,4 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# LegalLens - AI Legal Document Analysis Tool
+
+LegalLens is an AI-powered web application that helps users understand complex legal documents using Chrome's built-in AI capabilities. Built for the Google Chrome Built-in AI Challenge, it provides intelligent analysis and insights for legal documents.
+
+## Features
+
+- **Document Upload**
+  - Drag and drop PDF upload
+  - Sample document selection
+  - Client-side document processing
+  - 10MB file size limit
+
+- **AI Analysis**
+  - Privacy policy analysis
+  - Terms of service review
+  - Legal document summarization
+  - Risk assessment scoring
+  - Detailed findings categorization
+
+- **Privacy First**
+  - Client-side processing
+  - No server storage
+  - Secure document handling
+  - Chrome's built-in AI
+
+- **Modern UI/UX**
+  - Responsive design
+  - Side-by-side document view
+  - Interactive analysis panel
+  - Export functionality
+
+## Technology Stack
+
+- **Frontend**: Next.js (React)
+- **Styling**: Tailwind CSS
+- **PDF Processing**: pdfjs-dist
+- **AI Integration**: Chrome Built-in AI APIs
+  - Summarization API
+  - Write API
+  - Rewrite API
+  - Prompt API
 
 ## Getting Started
 
@@ -16,21 +56,61 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Requirements
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Google Chrome browser (for AI capabilities)
+- Node.js 18+ 
+- npm/yarn/pnpm
 
-## Learn More
+## Development
 
-To learn more about Next.js, take a look at the following resources:
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+4. Open Chrome and navigate to [http://localhost:3000](http://localhost:3000)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+legal-lens/
+├── app/                    # Next.js app directory
+│   ├── components/         # React components
+│   │   ├── AIAnalyzer.js  # AI analysis component
+│   │   └── utils/         # Utility functions
+│   ├── page.js            # Home page
+│   └── about/             # About page
+├── public/                 # Static assets
+└── styles/                # Global styles
+```
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT License
+
+Copyright (c) 2024 LegalLens
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
