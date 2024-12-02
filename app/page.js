@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 import PDFUploader from './components/pdf/PDFUploader';
 import PDFViewer from './components/pdf/PDFViewer';
 import Navbar from './components/Navbar';
-import AIAnalysis from './components/AIAnalysis';
-
+import AIAnalysis from './components/AIAnalyzer';
 const STORAGE_KEY = 'legal_lens_current_doc';
 
 export default function Home() {
@@ -58,15 +57,8 @@ export default function Home() {
                 </h2>
                 <div className="space-y-4">
                   {/* Analysis content */}
-                  <div className="p-4 rounded-xl bg-indigo-50 border border-indigo-100">
-                    <p className="text-sm text-indigo-600">
-                      AI analysis features coming soon...
-                    </p>
-                  </div>
+                  <AIAnalysis />
                 </div>
-              </div>
-              <div className="lg:w-[400px] fade-in">
-                <AIAnalysis />
               </div>
             </>
           )}
