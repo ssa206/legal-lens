@@ -93,7 +93,7 @@ export default function AIAnalysis({ currentPage }) {
   }, {}) || {};
 
   return (
-    <div className="flex flex-col gap-4 p-4 glass-panel rounded-xl">
+    <div className="flex flex-col gap-4 p-4 glass-panel rounded-xl h-full overflow-hidden">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Legal Analysis</h2>
         <div className="text-sm text-gray-500">
@@ -148,7 +148,7 @@ export default function AIAnalysis({ currentPage }) {
           </button>
         </div>
       ) : currentAnalysis ? (
-        <div className="space-y-6">
+        <div className="flex-1 overflow-y-auto">
           {/* Risk Overview Accordion */}
           <div className="rounded-xl border border-gray-200 divide-y divide-gray-200">
             <div className="p-4 bg-white rounded-t-xl">
