@@ -169,7 +169,12 @@ export class AIAnalyzer {
         // Parse the analysis into structured format
         const findings = analysis.split('\n').filter(line => line.trim())
           .map(finding => {
-            const cleanFinding = finding.replace(/^\*\s*/, '').trim();
+            // Remove asterisks and leading bullet points
+            const cleanFinding = finding
+              .replace(/^\*\s*/, '') // Remove leading asterisk bullet points
+              .replace(/\*\*/g, '') // Remove all ** markers
+              .trim();
+            
             return {
               text: cleanFinding,
               category: this.categorizeFinding(cleanFinding),
