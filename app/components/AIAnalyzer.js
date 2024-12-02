@@ -1,7 +1,6 @@
 'use client';
 import {useState, useEffect, useRef} from 'react';
 import { AIAnalyzer } from './utils/aiUtils';
-import RecommendationsPanel from './RecommendationsPanel';
 import SearchPanel from './SearchPanel';
 
 export default function AIAnalysis({ currentPage }) {
@@ -354,31 +353,18 @@ export default function AIAnalysis({ currentPage }) {
             Last updated: {new Date(currentAnalysis.timestamp).toLocaleTimeString()}
           </div>
 
-          {/* Search and Recommendations panels */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <SearchPanel
-              analysisCache={analysisCache}
-              onResultClick={(result) => {
-                const element = document.getElementById(`finding-${result.id}`);
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth' });
-                  element.classList.add('highlight-finding');
-                  setTimeout(() => element.classList.remove('highlight-finding'), 2000);
-                }
-              }}
-            />
-            
-            <RecommendationsPanel
-              findings={Object.values(analysisCache)
-                .flatMap(analysis => analysis.findings)}
-              onActionClick={(item) => {
-                const element = document.getElementById(`finding-${item.id}`);
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-            />
-          </div>
+          {/* Search Panel */}
+          <SearchPanel
+            analysisCache={analysisCache}
+            onResultClick={(result) => {
+              const element = document.getElementById(`finding-${result.id}`);
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+                element.classList.add('highlight-finding');
+                setTimeout(() => element.classList.remove('highlight-finding'), 2000);
+              }
+            }}
+          />
         </div>
       ) : (
         <div className="text-gray-500">No analysis available for this page</div>
