@@ -6,12 +6,54 @@ export class AIAnalyzer {
       this.WORD_LIMIT = 2000;
       this.MAX_RETRIES = 3;
       this.RETRY_DELAY = 1000; // 1 second
+
+      // Risk scoring weights
+      this.RISK_WEIGHTS = {
+        critical: 10,
+        warning: 5,
+        info: 1
+      };
     }
 
     async sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
-  
+
+    // Calculate risk score based on findings
+    calculateRiskScore(findings) {
+      const score = findings.reduce((total, finding) => {
+        return total + (this.RISK_WEIGHTS[finding.category] || 0);
+      }, 0);
+
+      // Normalize score to 0-100 range
+      const normalizedScore = Math.min(100, (score / 50) * 100);
+      
+      return {
+        score: Math.round(normalizedScore),
+        level: this.getRiskLevel(normalizedScore),
+        breakdown: this.getRiskBreakdown(findings)
+      };
+    }
+
+    getRiskLevel(score) {
+      if (score >= 70) return 'High Risk';
+      if (score >= 40) return 'Medium Risk';
+      return 'Low Risk';
+    }
+
+    getRiskBreakdown(findings) {
+      const categories = ['critical', 'warning', 'info'];
+      return categories.reduce((breakdown, category) => {
+        const count = findings.filter(f => f.category === category).length;
+        const weight = this.RISK_WEIGHTS[category];
+        breakdown[category] = {
+          count,
+          impact: count * weight
+        };
+        return breakdown;
+      }, {});
+    }
+
     // Initialize the summarizer with given options
     async initialize(options = {
       sharedContext: 'This is a legal document analysis',
@@ -48,24 +90,49 @@ export class AIAnalyzer {
     // Helper function to categorize findings
     categorizeFinding(text) {
       const lowerText = text.toLowerCase();
-      if (lowerText.includes('critical') || 
-          lowerText.includes('severe') || 
-          lowerText.includes('major') ||
-          lowerText.includes('significant risk') ||
-          lowerText.includes('dangerous')) {
-        return 'critical';
-      } else if (lowerText.includes('warning') || 
-                 lowerText.includes('caution') || 
-                 lowerText.includes('potential risk') ||
-                 lowerText.includes('unclear') ||
-                 lowerText.includes('vague')) {
-        return 'warning';
-      } else if (lowerText.includes('note') || 
-                 lowerText.includes('consider') || 
-                 lowerText.includes('may') ||
-                 lowerText.includes('might')) {
-        return 'info';
+      
+      // Enhanced categorization with more specific patterns
+      const patterns = {
+        critical: [
+          'critical',
+          'severe',
+          'major',
+          'significant risk',
+          'dangerous',
+          'immediate action',
+          'legal violation',
+          'non-compliant',
+          'breach',
+          'illegal'
+        ],
+        warning: [
+          'warning',
+          'caution',
+          'potential risk',
+          'unclear',
+          'vague',
+          'ambiguous',
+          'consider reviewing',
+          'may be problematic',
+          'potentially unfair'
+        ],
+        info: [
+          'note',
+          'consider',
+          'may',
+          'might',
+          'suggestion',
+          'recommendation',
+          'best practice'
+        ]
+      };
+
+      for (const [category, keywords] of Object.entries(patterns)) {
+        if (keywords.some(keyword => lowerText.includes(keyword))) {
+          return category;
+        }
       }
+      
       return 'warning'; // Default to warning for uncategorized items
     }
 
@@ -84,6 +151,12 @@ export class AIAnalyzer {
             - Vague or unclear language (Warning)
             - Potentially disadvantageous terms (Warning)
             - Missing or incomplete information (Info)
+            - Compliance issues (Critical)
+            - Data privacy concerns (Critical)
+            - Liability issues (Critical)
+            - Payment and fee structures (Warning)
+            - Termination clauses (Warning)
+            - Notice requirements (Info)
             
             Format each point as a clear, separate finding.`,
         });
@@ -109,8 +182,12 @@ export class AIAnalyzer {
           throw new Error('No findings in analysis');
         }
 
+        // Calculate risk score
+        const riskAnalysis = this.calculateRiskScore(findings);
+
         return {
           findings,
+          riskAnalysis,
           timestamp: new Date().toISOString(),
           retryCount
         };

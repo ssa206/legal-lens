@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@react-pdf/renderer": "^3.1.14",
+    "diff": "^7.0.0",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "next": "15.0.3",
     "pdfjs-dist": "^3.11.174",
     "react": "19.0.0-rc-66855b96-20241106",
