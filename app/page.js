@@ -95,7 +95,7 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Main Upload Card - Moved above features */}
+            {/* Main Upload Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
               {/* Privacy Notice */}
               <div className="flex items-center gap-3 mb-6 text-sm text-gray-600">
@@ -104,7 +104,6 @@ export default function Home() {
                 </svg>
                 <span>Your documents are processed securely and never stored</span>
               </div>
-
               <PDFUploader onFileChange={handleFileChange} />
             </div>
 
@@ -166,20 +165,28 @@ export default function Home() {
           </div>
         </div>
       ) : (
-        <>
-          {/* Left Panel - PDF Viewer */}
-          <div className="flex-1 min-h-[400px] sm:min-h-[500px] glass-panel rounded-xl sm:rounded-2xl p-2 sm:p-4 fade-in">
-            <PDFViewer 
-              file={currentPDF} 
-              onPageChange={handlePageChange}
-            />
-          </div>
+        <div className="flex-1 h-[calc(100vh-64px)]"> 
+          <div className="h-full p-4 sm:p-6 lg:p-8">
+            <div className="h-full max-w-[1920px] mx-auto">
+              <div className="h-full flex flex-col lg:flex-row gap-6">
+                {/* Left Panel - PDF Viewer */}
+                <div className="flex-1 h-full bg-white rounded-2xl shadow-sm border border-gray-100 p-4 overflow-hidden">
+                  <div className="h-full">
+                    <PDFViewer 
+                      file={currentPDF} 
+                      onPageChange={handlePageChange}
+                    />
+                  </div>
+                </div>
 
-          {/* Right Panel - AI Analysis */}
-          <div className="w-full lg:w-[400px] xl:w-[450px] min-h-[400px] sm:min-h-[500px] fade-in">
-            <AIAnalysis currentPage={currentPage} />
+                {/* Right Panel - AI Analysis */}
+                <div className="h-full lg:w-[400px] xl:w-[450px] bg-white rounded-2xl shadow-sm border border-gray-100 p-4 overflow-y-auto">
+                  <AIAnalysis currentPage={currentPage} />
+                </div>
+              </div>
+            </div>
           </div>
-        </>
+        </div>
       )}
 
       {showUploadModal && (
