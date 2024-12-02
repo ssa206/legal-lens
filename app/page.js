@@ -170,17 +170,18 @@ export default function Home() {
             <div className="h-full max-w-[1920px] mx-auto">
               <div className="h-full flex flex-col lg:flex-row gap-6">
                 {/* Left Panel - PDF Viewer */}
-                <div className="flex-1 h-full bg-white rounded-2xl shadow-sm border border-gray-100 p-4 overflow-hidden">
-                  <div className="h-full">
+                <div className="flex-1 min-h-[60vh] lg:h-full bg-white rounded-2xl shadow-sm border border-gray-100 p-4 overflow-hidden">
+                  <div className="h-full w-full">
                     <PDFViewer 
                       file={currentPDF} 
                       onPageChange={handlePageChange}
+                      className="h-full w-full"
                     />
                   </div>
                 </div>
 
                 {/* Right Panel - AI Analysis */}
-                <div className="h-full lg:w-[400px] xl:w-[450px] bg-white rounded-2xl shadow-sm border border-gray-100 p-4 overflow-y-auto">
+                <div className="min-h-[40vh] lg:h-full lg:w-[400px] xl:w-[450px] bg-white rounded-2xl shadow-sm border border-gray-100 p-4 overflow-y-auto">
                   <AIAnalysis currentPage={currentPage} />
                 </div>
               </div>

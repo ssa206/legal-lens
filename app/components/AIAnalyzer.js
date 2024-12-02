@@ -101,6 +101,19 @@ export default function AIAnalysis({ currentPage }) {
             Page {currentPage}
           </span>
         </div>
+        <button
+          onClick={async () => {
+            const { generatePDFReport } = await import('./utils/reportUtils');
+            const doc = await generatePDFReport('Legal Document', analysisCache);
+            doc.save('legal-analysis-report.pdf');
+          }}
+          className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export
+        </button>
       </div>
 
       {loading ? (
@@ -166,19 +179,6 @@ export default function AIAnalysis({ currentPage }) {
           <div className="rounded-3xl bg-white shadow-sm p-6">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-xl font-semibold text-gray-900">Risk Overview</h3>
-              <button
-                onClick={async () => {
-                  const { generatePDFReport } = await import('./utils/reportUtils');
-                  const doc = await generatePDFReport('Legal Document', analysisCache);
-                  doc.save('legal-analysis-report.pdf');
-                }}
-                className="flex items-center gap-2 bg-[#6366F1] hover:bg-[#5558E5] text-white px-6 py-3 rounded-xl transition-all"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Export Report
-              </button>
             </div>
             
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
