@@ -93,30 +93,40 @@ export default function AIAnalysis({ currentPage }) {
   }, {}) || {};
 
   return (
-    <div className="flex flex-col gap-4 p-4 glass-panel rounded-xl h-full overflow-hidden">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Legal Analysis</h2>
-        <div className="text-sm text-gray-500">
-          Page {currentPage}
+    <div className="flex flex-col gap-3 sm:gap-4 p-6 glass-panel rounded-3xl h-full overflow-hidden">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-semibold text-[#6366F1]">Legal Analysis</h2>
+          <span className="text-[#6366F1] opacity-70">
+            Page {currentPage}
+          </span>
         </div>
       </div>
 
       {loading ? (
-        <div className="p-8 text-center">
-          <div className="animate-pulse space-y-2">
-            <div className="text-gray-500">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center space-y-3">
+            <div className="w-16 h-16 mx-auto border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+            <div className="text-gray-600">
               Analyzing page {currentPage}...
             </div>
             {retryCount > 0 && (
-              <div className="text-yellow-600">
+              <div className="text-yellow-600 text-sm">
                 Retry attempt {retryCount} of 3
               </div>
             )}
           </div>
         </div>
       ) : error ? (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700">{error}</p>
+        <div className="p-6 bg-red-50 border border-red-100 rounded-xl space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-red-100 rounded-lg">
+              <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p className="text-red-700 font-medium">{error}</p>
+          </div>
           <button 
             onClick={() => {
               setError(null);
@@ -142,232 +152,153 @@ export default function AIAnalysis({ currentPage }) {
                   });
               }
             }}
-            className="mt-2 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm transition-colors"
+            className="w-full px-4 py-2 bg-white hover:bg-red-50 text-red-600 rounded-lg text-sm transition-all duration-200 border border-red-200 hover:border-red-300 flex items-center justify-center gap-2"
           >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
             Try Again
           </button>
         </div>
       ) : currentAnalysis ? (
-        <div className="flex-1 overflow-y-auto">
-          {/* Risk Overview Accordion */}
-          <div className="rounded-xl border border-gray-200 divide-y divide-gray-200">
-            <div className="p-4 bg-white rounded-t-xl">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Risk Overview</h3>
-                <button
-                  onClick={async () => {
-                    const { generatePDFReport } = await import('./utils/reportUtils');
-                    const doc = await generatePDFReport('Legal Document', analysisCache);
-                    doc.save('legal-analysis-report.pdf');
-                  }}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  Export Report
-                </button>
+        <div className="flex-1 overflow-y-auto space-y-6">
+          {/* Risk Overview */}
+          <div className="rounded-3xl bg-white shadow-sm p-6">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-xl font-semibold text-gray-900">Risk Overview</h3>
+              <button
+                onClick={async () => {
+                  const { generatePDFReport } = await import('./utils/reportUtils');
+                  const doc = await generatePDFReport('Legal Document', analysisCache);
+                  doc.save('legal-analysis-report.pdf');
+                }}
+                className="flex items-center gap-2 bg-[#6366F1] hover:bg-[#5558E5] text-white px-6 py-3 rounded-xl transition-all"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Export Report
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 sm:p-6 rounded-2xl bg-gray-50">
+                <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                  {currentAnalysis.riskAnalysis.score}
+                </div>
+                <div className="text-sm text-gray-600">Risk<br />Score</div>
               </div>
-              
-              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg">
-                  <div className="text-3xl font-bold text-gray-700">
-                    {currentAnalysis.riskAnalysis.score}
-                  </div>
-                  <div className="text-sm text-gray-500">Risk Score</div>
+              <div className="p-4 sm:p-6 rounded-2xl bg-gray-50">
+                <div className="text-xl sm:text-2xl font-bold mb-2 text-[#F59E0B]">
+                  {currentAnalysis.riskAnalysis.level.split(' ')[0]}<br />
+                  {currentAnalysis.riskAnalysis.level.split(' ')[1]}
                 </div>
-                <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg">
-                  <div className={`text-xl font-bold ${
-                    currentAnalysis.riskAnalysis.level === 'High Risk' ? 'text-red-600' :
-                    currentAnalysis.riskAnalysis.level === 'Medium Risk' ? 'text-yellow-600' :
-                    'text-green-600'
-                  }`}>
-                    {currentAnalysis.riskAnalysis.level}
-                  </div>
-                  <div className="text-sm text-gray-500">Risk Level</div>
+                <div className="text-sm text-gray-600">Risk<br />Level</div>
+              </div>
+              <div className="p-4 sm:p-6 rounded-2xl bg-gray-50">
+                <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                  {currentAnalysis.findings.length}
                 </div>
-                <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg">
-                  <div className="text-3xl font-bold text-gray-700">
-                    {currentAnalysis.findings.length}
-                  </div>
-                  <div className="text-sm text-gray-500">Total Findings</div>
+                <div className="text-sm text-gray-600">Total<br />Findings</div>
+              </div>
+              <div className="p-4 sm:p-6 rounded-2xl bg-gray-50">
+                <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                  {Object.keys(currentAnalysis.riskAnalysis.breakdown).length}
                 </div>
-                <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg">
-                  <div className="text-3xl font-bold text-gray-700">
-                    {Object.keys(currentAnalysis.riskAnalysis.breakdown).length}
-                  </div>
-                  <div className="text-sm text-gray-500">Categories</div>
-                </div>
+                <div className="text-sm text-gray-600">Categories</div>
               </div>
             </div>
 
-            {/* Risk Breakdown Section */}
-            <div className="p-4 bg-white">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Risk Breakdown</h4>
-              <div className="space-y-3">
-                {/* Critical Issues */}
-                <div className="relative">
-                  <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                    <div>
-                      <div className="font-medium text-red-700">Critical Issues</div>
-                      <div className="text-sm text-red-600">
-                        Impact Score: {currentAnalysis.riskAnalysis.breakdown.critical.impact}
+            {/* Risk Breakdown */}
+            <div className="mt-8">
+              <h4 className="text-lg font-semibold text-gray-900 mb-6">Risk Breakdown</h4>
+              <div className="space-y-6">
+                {Object.entries(currentAnalysis.riskAnalysis.breakdown).map(([category, data]) => (
+                  <div key={category} className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">{category}</span>
+                      <div className="flex items-center gap-6 text-gray-500">
+                        <div className="flex items-center gap-2">
+                          <span>Impact:</span>
+                          <span className="text-gray-900">{data.impact}%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span>Count:</span>
+                          <span className="text-gray-900">{data.count}</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="text-2xl font-bold text-red-700">{stats.critical || 0}</div>
-                  </div>
-                  <div className="absolute top-0 left-0 h-full w-1 bg-red-500 rounded-l-lg"></div>
-                </div>
-
-                {/* Warnings */}
-                <div className="relative">
-                  <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
-                    <div>
-                      <div className="font-medium text-yellow-700">Warnings</div>
-                      <div className="text-sm text-yellow-600">
-                        Impact Score: {currentAnalysis.riskAnalysis.breakdown.warning.impact}
-                      </div>
+                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-[#6366F1] rounded-full transition-all duration-500"
+                        style={{ width: `${data.impact}%` }}
+                      />
                     </div>
-                    <div className="text-2xl font-bold text-yellow-700">{stats.warning || 0}</div>
                   </div>
-                  <div className="absolute top-0 left-0 h-full w-1 bg-yellow-500 rounded-l-lg"></div>
-                </div>
-
-                {/* Info Items */}
-                <div className="relative">
-                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                    <div>
-                      <div className="font-medium text-blue-700">Info Items</div>
-                      <div className="text-sm text-blue-600">
-                        Impact Score: {currentAnalysis.riskAnalysis.breakdown.info.impact}
-                      </div>
-                    </div>
-                    <div className="text-2xl font-bold text-blue-700">{stats.info || 0}</div>
-                  </div>
-                  <div className="absolute top-0 left-0 h-full w-1 bg-blue-500 rounded-l-lg"></div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Findings Accordion */}
-          <div className="rounded-xl border border-gray-200 divide-y divide-gray-200">
-            {/* Critical Issues Section */}
-            {currentAnalysis.findings.some(f => f.category === 'critical') && (
-              <details className="group" open>
-                <summary className="flex items-center justify-between p-4 cursor-pointer bg-white hover:bg-gray-50">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <h3 className="text-lg font-semibold text-red-600">Critical Issues</h3>
-                  </div>
-                  <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <div className="p-4 bg-white space-y-3">
-                  {currentAnalysis.findings
-                    .filter(f => f.category === 'critical')
-                    .map(finding => (
-                      <div 
-                        key={finding.id} 
-                        id={`finding-${finding.id}`}
-                        className="p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                      >
-                        <p className="text-red-700">{finding.text}</p>
-                      </div>
-                    ))}
-                </div>
-              </details>
-            )}
-
-            {/* Warnings Section */}
-            {currentAnalysis.findings.some(f => f.category === 'warning') && (
-              <details className="group" open>
-                <summary className="flex items-center justify-between p-4 cursor-pointer bg-white hover:bg-gray-50">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <h3 className="text-lg font-semibold text-yellow-600">Warnings</h3>
-                  </div>
-                  <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <div className="p-4 bg-white space-y-3">
-                  {currentAnalysis.findings
-                    .filter(f => f.category === 'warning')
-                    .map(finding => (
-                      <div 
-                        key={finding.id} 
-                        id={`finding-${finding.id}`}
-                        className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                      >
-                        <p className="text-yellow-700">{finding.text}</p>
-                      </div>
-                    ))}
-                </div>
-              </details>
-            )}
-
-            {/* Information Section */}
-            {currentAnalysis.findings.some(f => f.category === 'info') && (
-              <details className="group" open>
-                <summary className="flex items-center justify-between p-4 cursor-pointer bg-white hover:bg-gray-50">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <h3 className="text-lg font-semibold text-blue-600">Additional Information</h3>
-                  </div>
-                  <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <div className="p-4 bg-white space-y-3">
-                  {currentAnalysis.findings
-                    .filter(f => f.category === 'info')
-                    .map(finding => (
-                      <div 
-                        key={finding.id} 
-                        id={`finding-${finding.id}`}
-                        className="p-4 bg-blue-50 border border-blue-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                      >
-                        <p className="text-blue-700">{finding.text}</p>
-                      </div>
-                    ))}
-                </div>
-              </details>
-            )}
-          </div>
-
-          {currentAnalysis.retryCount > 0 && (
-            <div className="text-sm text-yellow-600 bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-center">
-              Analysis succeeded after {currentAnalysis.retryCount} {currentAnalysis.retryCount === 1 ? 'retry' : 'retries'}
+          {/* Findings Section */}
+          <div className="rounded-3xl bg-white shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="text-xl font-semibold text-gray-900">Detailed Findings</h3>
             </div>
-          )}
-
-          <div className="text-xs text-gray-400">
-            Last updated: {new Date(currentAnalysis.timestamp).toLocaleTimeString()}
+            <div className="divide-y divide-gray-100">
+              {currentAnalysis.findings.map((finding, index) => (
+                <div key={index} className="p-6 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-start gap-4">
+                    <div className={`p-3 rounded-xl ${
+                      finding.category === 'critical' ? 'bg-red-100' :
+                      finding.category === 'warning' ? 'bg-amber-100' :
+                      'bg-blue-100'
+                    }`}>
+                      <svg className={`w-5 h-5 ${
+                        finding.category === 'critical' ? 'text-red-600' :
+                        finding.category === 'warning' ? 'text-amber-600' :
+                        'text-blue-600'
+                      }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d={finding.category === 'critical' ? 
+                            "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" :
+                            finding.category === 'warning' ?
+                            "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" :
+                            "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          } 
+                        />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-lg text-gray-900">{finding.category}</h4>
+                        <span className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                          finding.category === 'critical' ? 'bg-red-50 text-red-700' :
+                          finding.category === 'warning' ? 'bg-amber-50 text-amber-700' :
+                          'bg-blue-50 text-blue-700'
+                        }`}>
+                          {finding.category === 'critical' ? 'Critical' :
+                           finding.category === 'warning' ? 'Warning' : 'Info'}
+                        </span>
+                      </div>
+                      <p className="text-gray-600">{finding.text}</p>
+                      {finding.recommendation && (
+                        <div className="mt-3 text-sm">
+                          <span className="font-medium text-gray-900">Recommendation: </span>
+                          <span className="text-gray-600">{finding.recommendation}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-
-          {/* Search Panel */}
-          <SearchPanel
-            analysisCache={analysisCache}
-            onResultClick={(result) => {
-              const element = document.getElementById(`finding-${result.id}`);
-              if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-                element.classList.add('highlight-finding');
-                setTimeout(() => element.classList.remove('highlight-finding'), 2000);
-              }
-            }}
-          />
         </div>
       ) : (
-        <div className="text-gray-500">No analysis available for this page</div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-gray-500">No analysis available for this page</div>
+        </div>
       )}
     </div>
   );

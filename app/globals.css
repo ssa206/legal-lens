@@ -19,15 +19,27 @@
 }
 
 @layer base {
+  html {
+    font-size: 14px;
+    @screen sm {
+      font-size: 15px;
+    }
+    @screen lg {
+      font-size: 16px;
+    }
+  }
+
   body {
     color: var(--foreground);
     background: var(--background);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     background-image: 
-      radial-gradient(circle at 100% 100%, var(--primary-light) 0%, transparent 20%),
-      radial-gradient(circle at 0% 0%, var(--primary-light) 0%, transparent 20%);
+      radial-gradient(circle at 100% 100%, var(--primary-light) 0%, transparent 15%),
+      radial-gradient(circle at 0% 0%, var(--primary-light) 0%, transparent 15%);
     background-attachment: fixed;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 
   ::selection {
@@ -62,8 +74,8 @@
   }
 
   .button-primary {
-    @apply bg-[--primary] hover:bg-[--primary-dark] text-white font-medium px-6 py-2.5 rounded-xl
-    transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] shadow-sm
+    @apply bg-[--primary] hover:bg-[--primary-dark] text-white font-medium px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl
+    transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] shadow-sm text-sm sm:text-base
     hover:shadow-md hover:shadow-indigo-200 relative overflow-hidden;
     &::after {
       content: '';
@@ -80,12 +92,12 @@
   }
 
   .dropzone {
-    @apply border-2 border-dashed rounded-2xl p-8 transition-all duration-300
+    @apply border-2 border-dashed rounded-xl sm:rounded-2xl p-4 sm:p-8 transition-all duration-300
     bg-white hover:bg-indigo-50 border-gray-200 hover:border-indigo-300
     cursor-pointer text-center relative overflow-hidden;
     background-image: 
-      radial-gradient(circle at 0% 0%, var(--primary-light) 0%, transparent 25%),
-      radial-gradient(circle at 100% 100%, var(--primary-light) 0%, transparent 25%);
+      radial-gradient(circle at 0% 0%, var(--primary-light) 0%, transparent 20%),
+      radial-gradient(circle at 100% 100%, var(--primary-light) 0%, transparent 20%);
     animation: pulse 3s infinite;
   }
 
