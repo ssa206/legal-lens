@@ -7,6 +7,7 @@ export default function AIAnalysis({ currentPage }) {
   const [analysisCache, setAnalysisCache] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
   const initializationRef = useRef(false);
   
   useEffect(() => {
@@ -58,16 +59,18 @@ export default function AIAnalysis({ currentPage }) {
       try {
         setLoading(true);
         setError(null);
+        setRetryCount(0);
         console.log('Starting analysis for page', currentPage);
         const result = await analyzer.analyzeLegalText(pageText);
         console.log('Analysis completed:', result);
+        setRetryCount(result.retryCount);
         setAnalysisCache(prev => ({
           ...prev,
           [currentPage]: result
         }));
       } catch (error) {
         console.error('Failed to analyze page:', error);
-        setError('Failed to analyze the page: ' + error.message);
+        setError('Failed to analyze the page. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -99,13 +102,49 @@ export default function AIAnalysis({ currentPage }) {
 
       {loading ? (
         <div className="p-8 text-center">
-          <div className="animate-pulse text-gray-500">
-            Analyzing page {currentPage}...
+          <div className="animate-pulse space-y-2">
+            <div className="text-gray-500">
+              Analyzing page {currentPage}...
+            </div>
+            {retryCount > 0 && (
+              <div className="text-yellow-600">
+                Retry attempt {retryCount} of 3
+              </div>
+            )}
           </div>
         </div>
       ) : error ? (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-700">{error}</p>
+          <button 
+            onClick={() => {
+              setError(null);
+              setRetryCount(0);
+              const pageKey = `legal_lens_page_${currentPage}_text`;
+              const pageText = localStorage.getItem(pageKey);
+              if (pageText && analyzer) {
+                setLoading(true);
+                analyzer.analyzeLegalText(pageText)
+                  .then(result => {
+                    setRetryCount(result.retryCount);
+                    setAnalysisCache(prev => ({
+                      ...prev,
+                      [currentPage]: result
+                    }));
+                    setError(null);
+                  })
+                  .catch(err => {
+                    setError('Failed to analyze the page. Please try again.');
+                  })
+                  .finally(() => {
+                    setLoading(false);
+                  });
+              }
+            }}
+            className="mt-2 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       ) : currentAnalysis ? (
         <div className="space-y-6">
@@ -124,6 +163,12 @@ export default function AIAnalysis({ currentPage }) {
               <div className="text-sm text-blue-600">Info Items</div>
             </div>
           </div>
+
+          {currentAnalysis.retryCount > 0 && (
+            <div className="text-sm text-yellow-600 bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-center">
+              Analysis succeeded after {currentAnalysis.retryCount} {currentAnalysis.retryCount === 1 ? 'retry' : 'retries'}
+            </div>
+          )}
 
           {/* Critical Issues */}
           {currentAnalysis.findings.some(f => f.category === 'critical') && (

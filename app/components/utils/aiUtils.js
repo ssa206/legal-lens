@@ -4,6 +4,12 @@ export class AIAnalyzer {
       this.summarizer = null;
       this.isAvailable = false;
       this.WORD_LIMIT = 2000;
+      this.MAX_RETRIES = 3;
+      this.RETRY_DELAY = 1000; // 1 second
+    }
+
+    async sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
   
     // Initialize the summarizer with given options
@@ -62,22 +68,9 @@ export class AIAnalyzer {
       }
       return 'warning'; // Default to warning for uncategorized items
     }
-  
-    // Analyze legal text for issues and concerns
-    async analyzeLegalText(text) {
-      console.log('Starting legal text analysis...');
-      console.log('Analyzer state:', { isAvailable: this.isAvailable, hasSummarizer: !!this.summarizer });
 
-      if (!this.isAvailable || !this.summarizer) {
-        throw new Error('AI Analyzer is not initialized');
-      }
-
-      if (!text || typeof text !== 'string') {
-        throw new Error('Invalid text input: ' + (typeof text));
-      }
-
+    async retryAnalysis(text, retryCount = 0) {
       try {
-        console.log('Sending text for analysis (length:', text.length, 'chars)');
         const analysis = await this.summarizer.summarize(text, {
           context: `Analyze this legal text for potential issues. For each issue found:
             1. Identify if it's a critical issue, warning, or informational note
@@ -95,6 +88,11 @@ export class AIAnalyzer {
             Format each point as a clear, separate finding.`,
         });
 
+        // Check if we got a valid response
+        if (!analysis || analysis.trim() === '') {
+          throw new Error('Empty analysis response');
+        }
+
         // Parse the analysis into structured format
         const findings = analysis.split('\n').filter(line => line.trim())
           .map(finding => {
@@ -106,11 +104,44 @@ export class AIAnalyzer {
             };
           });
 
-        console.log('Analysis completed successfully');
+        // Validate that we have at least one finding
+        if (findings.length === 0) {
+          throw new Error('No findings in analysis');
+        }
+
         return {
           findings,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          retryCount
         };
+      } catch (error) {
+        if (retryCount < this.MAX_RETRIES) {
+          console.log(`Retry attempt ${retryCount + 1} of ${this.MAX_RETRIES}`);
+          await this.sleep(this.RETRY_DELAY * (retryCount + 1)); // Exponential backoff
+          return this.retryAnalysis(text, retryCount + 1);
+        }
+        throw error;
+      }
+    }
+  
+    // Analyze legal text for issues and concerns
+    async analyzeLegalText(text) {
+      console.log('Starting legal text analysis...');
+      console.log('Analyzer state:', { isAvailable: this.isAvailable, hasSummarizer: !!this.summarizer });
+
+      if (!this.isAvailable || !this.summarizer) {
+        throw new Error('AI Analyzer is not initialized');
+      }
+
+      if (!text || typeof text !== 'string') {
+        throw new Error('Invalid text input: ' + (typeof text));
+      }
+
+      try {
+        console.log('Sending text for analysis (length:', text.length, 'chars)');
+        const result = await this.retryAnalysis(text);
+        console.log('Analysis completed successfully');
+        return result;
       } catch (error) {
         console.error('Failed to analyze legal text:', error);
         throw error;
