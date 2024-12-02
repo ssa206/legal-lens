@@ -181,31 +181,41 @@ export default function AIAnalysis({ currentPage }) {
               </button>
             </div>
             
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-4 sm:p-6 rounded-2xl bg-gray-50">
-                <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+              <div className="min-h-[90px] flex flex-col p-2.5 rounded-xl bg-gray-50">
+                <div className="text-lg font-bold text-gray-900">
                   {currentAnalysis.riskAnalysis.score}
                 </div>
-                <div className="text-sm text-gray-600">Risk<br />Score</div>
-              </div>
-              <div className="p-4 sm:p-6 rounded-2xl bg-gray-50">
-                <div className="text-xl sm:text-2xl font-bold mb-2 text-[#F59E0B]">
-                  {currentAnalysis.riskAnalysis.level.split(' ')[0]}<br />
-                  {currentAnalysis.riskAnalysis.level.split(' ')[1]}
+                <div className="text-[10px] text-gray-500">
+                  Risk Score
                 </div>
-                <div className="text-sm text-gray-600">Risk<br />Level</div>
               </div>
-              <div className="p-4 sm:p-6 rounded-2xl bg-gray-50">
-                <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+
+              <div className="min-h-[90px] flex flex-col p-2.5 rounded-xl bg-gray-50">
+                <div className="text-base font-bold text-[#F59E0B]">
+                  Medium Risk
+                </div>
+                <div className="text-[10px] text-gray-500">
+                  Risk Level
+                </div>
+              </div>
+
+              <div className="min-h-[90px] flex flex-col p-2.5 rounded-xl bg-gray-50">
+                <div className="text-lg font-bold text-gray-900">
                   {currentAnalysis.findings.length}
                 </div>
-                <div className="text-sm text-gray-600">Total<br />Findings</div>
+                <div className="text-[10px] text-gray-500">
+                  Total Findings
+                </div>
               </div>
-              <div className="p-4 sm:p-6 rounded-2xl bg-gray-50">
-                <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+
+              <div className="min-h-[90px] flex flex-col p-2.5 rounded-xl bg-gray-50">
+                <div className="text-lg font-bold text-gray-900">
                   {Object.keys(currentAnalysis.riskAnalysis.breakdown).length}
                 </div>
-                <div className="text-sm text-gray-600">Categories</div>
+                <div className="text-[10px] text-gray-500">
+                  Categories
+                </div>
               </div>
             </div>
 
