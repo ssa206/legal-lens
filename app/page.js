@@ -10,6 +10,7 @@ const STORAGE_KEY = 'legal_lens_current_doc';
 export default function Home() {
   const [currentPDF, setCurrentPDF] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleFileChange = (file) => {
     // Clear previous document data
@@ -20,6 +21,10 @@ export default function Home() {
 
   const handleNewUpload = () => {
     setShowUploadModal(true);
+  };
+
+  const handlePageChange = (pageNum) => {
+    setCurrentPage(pageNum);
   };
 
   // Clean up object URLs on unmount
@@ -47,49 +52,28 @@ export default function Home() {
             <>
               {/* Left Panel - PDF Viewer */}
               <div className="flex-1 min-h-[500px] glass-panel rounded-2xl p-4 fade-in">
-                <PDFViewer file={currentPDF} />
+                <PDFViewer 
+                  file={currentPDF} 
+                  onPageChange={handlePageChange}
+                />
               </div>
 
               {/* Right Panel - AI Analysis */}
-              <div className="lg:w-[400px] glass-panel rounded-2xl p-6 h-full overflow-y-auto fade-in">
-                <h2 className="text-xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-                  Document Analysis
-                </h2>
-                <div className="space-y-4">
-                  {/* Analysis content */}
-                  <AIAnalysis />
-                </div>
+              <div className="lg:w-1/3 min-h-[500px] fade-in">
+                <AIAnalysis currentPage={currentPage} />
               </div>
             </>
           )}
         </div>
-      </div>
 
-      {/* Upload Modal */}
-      {showUploadModal && (
-        <div className="modal-overlay">
-          <div className="modal-content relative">
-            <button
-              onClick={() => setShowUploadModal(false)}
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
-              aria-label="Close modal"
-            >
-              <svg className="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <div className="mb-6">
-              <h2 className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-                Upload Legal Document
-              </h2>
-              <p className="text-gray-500 mt-1">
-                Upload your document to get started with AI-powered analysis
-              </p>
+        {showUploadModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-2xl">
+              <PDFUploader onFileChange={handleFileChange} />
             </div>
-            <PDFUploader onFileChange={handleFileChange} />
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </main>
   );
 }

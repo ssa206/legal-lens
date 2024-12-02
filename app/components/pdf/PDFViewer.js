@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -14,8 +14,9 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
  * @component
  * @param {Object} props
  * @param {string} props.file - PDF file URL to display
+ * @param {function} props.onPageChange - Callback function to notify parent of page changes
  */
-const PDFViewer = ({ file }) => {
+const PDFViewer = ({ file, onPageChange }) => {
   const [numPages, setNumPages] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [scale, setScale] = useState(1);
@@ -25,6 +26,12 @@ const PDFViewer = ({ file }) => {
     setNumPages(numPages);
     setLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (onPageChange) {
+      onPageChange(currentPage);
+    }
+  }, [currentPage, onPageChange]);
 
   const zoomIn = () => setScale(prev => Math.min(prev + 0.1, 3));
   const zoomOut = () => setScale(prev => Math.max(prev - 0.1, 0.5));
