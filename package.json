@@ -16,8 +16,8 @@
     "jspdf-autotable": "^3.8.4",
     "next": "15.0.3",
     "pdfjs-dist": "^3.11.174",
-    "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-dropzone": "^14.3.5",
     "react-markdown": "^9.0.1",
     "react-pdf": "^7.5.1"

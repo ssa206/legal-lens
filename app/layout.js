@@ -4,6 +4,21 @@ import "./globals.css";
 export const metadata = {
   title: "Legal Lens",
   description: "Understanding Legal Documents made easy",
+  icons: {
+    icon: [
+      {
+        url: "/favicon.svg",
+        type: "image/svg+xml",
+      }
+    ],
+    shortcut: ["/favicon.svg"],
+    apple: [
+      {
+        url: "/favicon.svg",
+        type: "image/svg+xml",
+      }
+    ],
+  },
 };
 
 export default function RootLayout({ children }) {
