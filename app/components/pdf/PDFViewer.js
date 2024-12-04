@@ -22,22 +22,29 @@ const PDFViewer = ({ file, onPageChange }) => {
   const [scale, setScale] = useState(1);
   const [loading, setLoading] = useState(true);
 
+  // Reset state when file changes
+  useEffect(() => {
+    setCurrentPage(1);
+    setScale(1);
+    setLoading(true);
+  }, [file]);
+
   const onDocumentLoadSuccess = useCallback(({ numPages }) => {
     setNumPages(numPages);
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    if (onPageChange) {
+    if (onPageChange && currentPage <= numPages) {
       onPageChange(currentPage);
     }
-  }, [currentPage, onPageChange]);
+  }, [currentPage, onPageChange, numPages]);
 
   const zoomIn = () => setScale(prev => Math.min(prev + 0.1, 3));
   const zoomOut = () => setScale(prev => Math.max(prev - 0.1, 0.5));
   const resetZoom = () => setScale(1);
 
-  const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, numPages));
+  const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, numPages || 1));
   const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
 
   if (!file) {

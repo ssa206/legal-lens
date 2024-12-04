@@ -3,7 +3,7 @@ import {useState, useEffect, useRef} from 'react';
 import { AIAnalyzer } from './utils/aiUtils';
 import SearchPanel from './SearchPanel';
 
-export default function AIAnalysis({ currentPage }) {
+export default function AIAnalysis({ currentPage, documentId }) {
   const [analyzer, setAnalyzer] = useState(null);
   const [analysisCache, setAnalysisCache] = useState({});
   const [loading, setLoading] = useState(false);
@@ -29,6 +29,15 @@ export default function AIAnalysis({ currentPage }) {
     }
     initializeAnalyzer();
   }, []);
+
+  // Clear analysis cache when a new document is loaded
+  useEffect(() => {
+    if (documentId) {
+      console.log('New document detected, clearing analysis cache');
+      setAnalysisCache({});
+      setError(null);
+    }
+  }, [documentId]);
 
   useEffect(() => {
     const analyzeCurrentPage = async () => {

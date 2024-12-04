@@ -10,6 +10,7 @@ const STORAGE_KEY = 'legal_lens_current_doc';
 
 export default function Home() {
   const [currentPDF, setCurrentPDF] = useState(null);
+  const [documentId, setDocumentId] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -17,6 +18,8 @@ export default function Home() {
     // Clear previous document data
     localStorage.removeItem(STORAGE_KEY);
     setCurrentPDF(file);
+    setDocumentId(Date.now()); // Generate a unique ID for the new document
+    setCurrentPage(1); // Reset to first page when new document is loaded
     setShowUploadModal(false);
   };
 
@@ -182,7 +185,10 @@ export default function Home() {
 
                 {/* Right Panel - AI Analysis */}
                 <div className="min-h-[40vh] lg:h-full lg:w-[400px] xl:w-[450px] bg-white rounded-2xl shadow-sm border border-gray-100 p-4 overflow-y-auto">
-                  <AIAnalysis currentPage={currentPage} />
+                  <AIAnalysis 
+                    currentPage={currentPage} 
+                    documentId={documentId} 
+                  />
                 </div>
               </div>
             </div>
