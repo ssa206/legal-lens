@@ -42,19 +42,44 @@ LegalLens is an AI-powered web application that helps users understand complex l
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm (comes with Node.js)
+- A modern web browser (preferably Google Chrome)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ssa206/legal-lens.git
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Open your browser and navigate to:
+   ```
+   http://localhost:3000
+   ```
+
+### Build for Production
+
+To create a production build:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The production server will start at `http://localhost:3000`
 
 ## Requirements
 
