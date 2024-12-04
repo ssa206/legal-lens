@@ -31,6 +31,18 @@ export default function Home() {
     setCurrentPage(pageNum);
   };
 
+  const handleLogoClick = () => {
+    // Reset all state
+    setCurrentPDF(null);
+    setDocumentId(null);
+    setCurrentPage(1);
+    setShowUploadModal(false);
+    // Clean up any object URLs
+    if (currentPDF && currentPDF.startsWith('blob:')) {
+      URL.revokeObjectURL(currentPDF);
+    }
+  };
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
@@ -62,7 +74,7 @@ export default function Home() {
       <nav className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <Link href="/" className="flex items-center">
+            <Link href="/" onClick={handleLogoClick} className="flex items-center">
               <span className="text-xl font-bold text-gray-900">
                 Legal<span className="text-indigo-600">Lens</span>
               </span>
